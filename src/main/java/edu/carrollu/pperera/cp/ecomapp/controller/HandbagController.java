@@ -5,8 +5,11 @@
  */
 package edu.carrollu.pperera.cp.ecomapp.controller;
 
+import edu.carrollu.pperera.cp.ecomapp.model.Handbag;
+import edu.carrollu.pperera.cp.ecomapp.model.HandbagService;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -20,7 +23,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "HandbagController", urlPatterns = {"/hbc"})
 public class HandbagController extends HttpServlet {
-
+    public static final String ACTION = "action";
+    public static final String LIST_ACTION = "displayList";
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -33,8 +37,26 @@ public class HandbagController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        
+          String destination = "/handbagList.jsp"; // default
+       
+
+        try {
+            String action = request.getParameter(ACTION);
+            HandbagService handbagService = new HandbagService();
+            List<Handbag> handbagList = null;
+
+            if (action.equalsIgnoreCase(LIST_ACTION)) {
+              handbagList = handbagService.getHandbagList();
+              request.setAttribute("handbagList", handbagList);
+            } 
+        } catch (Exception e) {
+            destination = "/handbagList.jsp";
+            request.setAttribute("errMessage", e.getMessage());
+            }
+            
        RequestDispatcher view
-               = request.getRequestDispatcher("/handbagList.jsp");
+               = request.getRequestDispatcher(destination);
        view.forward(request, response);
         
     }
